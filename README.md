@@ -1,7 +1,7 @@
 # STM32F4 Configuration: I2S Audio In / Out
 My high resolution audio I/O configuration with STM32F4 Discovery board and Pmod I2S2 (24-bit, 96 KHz).
 
-It uses a ping pong buffer audio stream, taking advantage of DMA in circular mode to continuously update a “receive” buffer completely independent of the CPU. So the other half of the buffer is free to be processed, before being sent to the I2S peripheral data register through the transmit buffer.
+It uses a ping pong buffer audio stream, taking advantage of DMA in circular mode to continuously update 1/2 of a input buffer completely independent of the CPU. So the other half of the buffer is free to be processed, before being sent to the I2S peripheral data register through the output buffer.
 
 More information about ping pong buffer on STM32 available [here](https://audiodsplab.wordpress.com/ping-pong-buffer-audio-stream/).
 
