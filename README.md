@@ -3,6 +3,8 @@ My high resolution audio I/O configuration with STM32F4 Discovery board and Pmod
 
 It uses a ping pong buffer audio stream, taking advantage of DMA in circular mode to continuously update 1/2 of a input buffer completely independent of the CPU. So the other half of the buffer is free to be processed, before being sent to the I2S peripheral data register through the output buffer.
 
+The input data is converted to floating point values in the range of [-1, 1] to prepare it for any processing function, and then restored as 24-bit integer values.
+
 More information about ping pong buffer on STM32 available [here](https://audiodsplab.wordpress.com/ping-pong-buffer-audio-stream/).
 
 <p align=center>
