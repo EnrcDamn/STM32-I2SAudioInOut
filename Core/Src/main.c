@@ -334,6 +334,25 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+float int24ToFloat(int inSample)
+{
+	// if inSample is negative, convert it to 32-bit negative int
+	if (inSample & 0x800000)
+		inSample |= 0xff000000;
+
+	return ((float)inSample / (8388608.f));
+}
+
+
+int floatToInt24(float inSample)
+{
+	int sample = (int)(inSample * 8388608.f);
+	if (sample & 0x80000000)
+		sample &= 0xffffff;
+	return sample;
+}
+
+
 void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	// Form L and R samples from the halfwords transfered via I2S
@@ -341,9 +360,11 @@ void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 	int lIn = (int) (rxBuf[0]<<8)|(rxBuf[1]>>8);
 	int rIn = (int) (rxBuf[2]<<8)|(rxBuf[3]>>8);
 
-	// Pass through
-	int lOut = lIn;
-	int rOut = rIn;
+	float lInNormalized = int24ToFloat(lIn);
+	float rInNormalized = int24ToFloat(rIn);
+
+	int lOut = floatToInt24(lInNormalized);
+	int rOut = floatToInt24(rInNormalized);
 
 	// Disassemble L and R samples into halfwords and store to buffer
 	txBuf[0] = (lOut>>8) & 0xFFFF;
@@ -355,12 +376,17 @@ void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	// Form L and R samples from the halfwords transfered via I2S
-	int lIn = (int) (rxBuf[4]<<8)|(rxBuf[5]>>8);
-	int rIn = (int) (rxBuf[6]<<8)|(rxBuf[7]>>8);
+	// Left shift on first halfword, right shift on second one -> 24 bit sample
+	int lIn = ((int) (rxBuf[4]<<8)|(rxBuf[5]>>8));
+	int rIn = ((int) (rxBuf[6]<<8)|(rxBuf[7]>>8));
 
-	int lOut = lIn;
-	int rOut = rIn;
+	float f_lIn = int24ToFloat(lIn);
+	float f_rIn = int24ToFloat(rIn);
 
+	int lOut = floatToInt24(lInNormalized);
+	int rOut = floatToInt24(rInNormalized);
+
+	// Disassemble L and R samples into halfwords and store to buffer
 	txBuf[4] = (lOut>>8) & 0xFFFF;
 	txBuf[5] = (lOut<<8) & 0xFFFF;
 	txBuf[6] = (rOut>>8) & 0xFFFF;
