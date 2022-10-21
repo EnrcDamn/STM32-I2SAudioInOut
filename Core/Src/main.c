@@ -357,8 +357,8 @@ void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	// Form L and R samples from the halfwords transfered via I2S
 	// Left shift on first halfword, right shift on second one -> 24 bit sample
-	int lIn = (int) (rxBuf[0]<<8)|(rxBuf[1]>>8);
-	int rIn = (int) (rxBuf[2]<<8)|(rxBuf[3]>>8);
+	int lIn = (int) ((rxBuf[0]<<8)|(rxBuf[1]>>8));
+	int rIn = (int) ((rxBuf[2]<<8)|(rxBuf[3]>>8));
 
 	float f_lIn = int24ToFloat(lIn);
 	float f_rIn = int24ToFloat(rIn);
@@ -377,8 +377,8 @@ void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	// Form L and R samples from the halfwords transfered via I2S
 	// Left shift on first halfword, right shift on second one -> 24 bit sample
-	int lIn = ((int) (rxBuf[4]<<8)|(rxBuf[5]>>8));
-	int rIn = ((int) (rxBuf[6]<<8)|(rxBuf[7]>>8));
+	int lIn = (int) ((rxBuf[4]<<8)|(rxBuf[5]>>8));
+	int rIn = (int) ((rxBuf[6]<<8)|(rxBuf[7]>>8));
 
 	float f_lIn = int24ToFloat(lIn);
 	float f_rIn = int24ToFloat(rIn);
