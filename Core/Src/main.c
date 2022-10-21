@@ -360,11 +360,11 @@ void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 	int lIn = (int) (rxBuf[0]<<8)|(rxBuf[1]>>8);
 	int rIn = (int) (rxBuf[2]<<8)|(rxBuf[3]>>8);
 
-	float lInNormalized = int24ToFloat(lIn);
-	float rInNormalized = int24ToFloat(rIn);
+	float f_lIn = int24ToFloat(lIn);
+	float f_rIn = int24ToFloat(rIn);
 
-	int lOut = floatToInt24(lInNormalized);
-	int rOut = floatToInt24(rInNormalized);
+	int lOut = floatToInt24(f_lIn);
+	int rOut = floatToInt24(f_rIn);
 
 	// Disassemble L and R samples into halfwords and store to buffer
 	txBuf[0] = (lOut>>8) & 0xFFFF;
@@ -383,8 +383,8 @@ void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
 	float f_lIn = int24ToFloat(lIn);
 	float f_rIn = int24ToFloat(rIn);
 
-	int lOut = floatToInt24(lInNormalized);
-	int rOut = floatToInt24(rInNormalized);
+	int lOut = floatToInt24(f_lIn);
+	int rOut = floatToInt24(f_rIn);
 
 	// Disassemble L and R samples into halfwords and store to buffer
 	txBuf[4] = (lOut>>8) & 0xFFFF;
