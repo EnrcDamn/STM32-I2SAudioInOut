@@ -34,7 +34,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-// the sample data is splitted into 2 uint16, 2 channels (l & r) -> 2*2
+// the sample data is splitted into 2 uint16, 2 channels (L & R) -> 2*2
 #define SAMPLE_SIZE 4
 
 /* USER CODE END PD */
@@ -100,7 +100,7 @@ int main(void)
   MX_I2S2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Call to I2S data transfer using DMA, for Ping Pong buffer audio stream
+  // Call to I2S data transfer using DMA, for ping pong buffer audio stream
   // Data size of 4 -> a full transfer is 2 left-right sample pairs (4 uint16 total)
   HAL_I2SEx_TransmitReceive_DMA(&hi2s2, txBuf, rxBuf, SAMPLE_SIZE);
 
@@ -342,7 +342,7 @@ float int24ToFloat(int inSample)
 {
 	// if inSample is negative, convert it to 32-bit negative int
 	if (inSample & 0x800000)
-		inSample |= 0xff000000;
+		inSample |= 0xFF000000;
 	return ((float)inSample / (8388608.f));
 }
 
@@ -351,7 +351,7 @@ int floatToInt24(float inSample)
 {
 	int sample = (int)(inSample * 8388608.f);
 	if (sample & 0x80000000)
-		sample &= 0xffffff;
+		sample &= 0xFFFFFF;
 	return sample;
 }
 
