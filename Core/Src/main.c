@@ -33,6 +33,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+// the sample data is splitted into 2 uint16, 2 channels (l & r) -> 2*2
+#define SAMPLE_SIZE 4
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,8 +64,8 @@ static void MX_I2S2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t rxBuf[8]; // Receive buffer
-uint16_t txBuf[8]; // Transmit buffer
+uint16_t rxBuf[SAMPLE_SIZE * 2]; // Receive buffer (1st -> half, 2nd -> complete)
+uint16_t txBuf[SAMPLE_SIZE * 2]; // Transmit buffer
 /* USER CODE END 0 */
 
 /**
@@ -97,8 +101,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Call to I2S data transfer using DMA, for Ping Pong buffer audio stream
-  // Data size of 4 -> a full transfer is 2 left-right sample pairs (4 samples total)
-  HAL_I2SEx_TransmitReceive_DMA(&hi2s2, txBuf, rxBuf, 4);
+  // Data size of 4 -> a full transfer is 2 left-right sample pairs (4 uint16 total)
+  HAL_I2SEx_TransmitReceive_DMA(&hi2s2, txBuf, rxBuf, SAMPLE_SIZE);
 
   /* USER CODE END 2 */
 
@@ -339,7 +343,6 @@ float int24ToFloat(int inSample)
 	// if inSample is negative, convert it to 32-bit negative int
 	if (inSample & 0x800000)
 		inSample |= 0xff000000;
-
 	return ((float)inSample / (8388608.f));
 }
 
@@ -353,6 +356,13 @@ int floatToInt24(float inSample)
 }
 
 
+float process(float inSample)
+{
+	// Do your processing here...
+	return inSample;
+}
+
+
 void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	// Form L and R samples from the halfwords transfered via I2S
@@ -362,6 +372,10 @@ void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
 
 	float f_lIn = int24ToFloat(lIn);
 	float f_rIn = int24ToFloat(rIn);
+
+	// Processing
+	f_lIn = process(f_lIn);
+	f_rIn = process(f_rIn);
 
 	int lOut = floatToInt24(f_lIn);
 	int rOut = floatToInt24(f_rIn);
@@ -382,6 +396,10 @@ void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
 
 	float f_lIn = int24ToFloat(lIn);
 	float f_rIn = int24ToFloat(rIn);
+
+	// Processing
+	f_lIn = process(f_lIn);
+	f_rIn = process(f_rIn);
 
 	int lOut = floatToInt24(f_lIn);
 	int rOut = floatToInt24(f_rIn);
